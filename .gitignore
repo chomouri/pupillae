@@ -1,0 +1,12 @@
+venv
+postgreSQL
+__pycache__
+conf.ini
+bot_token
+dev_testing
+wip
+*/notes/*
+
+# Python egg metadata
+/*.egg-info
+/*.egg
