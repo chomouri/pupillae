@@ -28,6 +28,7 @@ conn = psycopg2.connect(**fons)
 
 # As luck would have it, the default tables are best sorted alphabetically
 TABLES = sorted(fons_pg.get_tables(conn))
+FOREIGN_KEYS = fons_pg.get_fk_details(conn)
 pupillae = {}
 for table in TABLES:
     col_details = map(list, fons_pg.get_col_details(conn, table))
@@ -36,12 +37,17 @@ for table in TABLES:
     table_values = {}
     for detail in col_details:
         col_name = [detail.pop(0)]
-        col_keys = ('type', 'len')
+        col_keys = ('type', 'len', 'default_value')
         col_values = [dict(list(map(tuple, zip(col_keys, detail))))]
         table_values.update(zip(col_name, col_values))
     table_values = [table_values]
     pupillae.update(zip(table_name, table_values))
 # print("full dict:", pupillae)
+for row in FOREIGN_KEYS.values():
+    for table in pupillae.keys():
+        if row["fk_column"] in pupillae[table].keys() and row["foreign_table"] == table:
+            pupillae[table][row["fk_column"]]["default_value"] = "FK"
+            print("FK found in:", table, "->", row["fk_column"])
 
 if conn is not None:
     conn.close()
@@ -90,12 +96,16 @@ def select_image(sender, app_data, user_data):
     return
 
 def submit_psql(sender, app_data, user_data):
+    query_dict = {}
     for table, value in win_id_dict.items():
-        print("TABLE =", table, "ID =", value["id"])
+        query_dict[table] = {}
+        # print("TABLE =", table, "ID =", value["id"])
         for column, id in value["fields"].items():
-            print("COLUMN =", column, "ID = ", id)
-            print("VALUE =", dpg.get_value(id))
-    print(sender, app_data, user_data)
+            query_dict[table][column] = dpg.get_value(id)
+            # print("COLUMN =", column, "ID = ", id)
+            # print("VALUE =", dpg.get_value(id))
+    pg_response = fons_pg.compose_psql(query_dict)
+    print(pg_response)
     dpg.set_item_label(comm_id_dict.get("READY"), "SUCCESS")
     delete_image_buttons()
 
@@ -123,11 +133,14 @@ with dpg.window(label="Photo", id=photo_window, width=410, height=260):
 
 # Show PG Insert Tables:
 win_id_dict = {}
+prev_win_height = 0
 for table, columns in pupillae.items():
     default_coord = (410, 0)
     column_counter = 0
     max_display_col = 2
-    with dpg.window(label=table, width=890, height=200, pos=[default_coord[0], default_coord[1] + (TABLES.index(table)/len(pupillae))*700]):
+    win_height = 50+(30*len(columns)/2)
+    with dpg.window(label=table, width=890, height=win_height, pos=[default_coord[0], prev_win_height]):
+        prev_win_height += win_height
         win_id_dict[table] = {}
         win_id_dict[table]["id"] = dpg.last_item()
         dpg.add_checkbox(label="Persist", default_value=True)
@@ -143,7 +156,12 @@ for table, columns in pupillae.items():
             if col_details['type'] == "bool":
                 dpg.add_checkbox(label="")
             if col_details['type'] == "int4":
-                dpg.add_input_int(label="", step=0, width=85)
+                if col_details.get('default_value') != None and col_details.get('default_value').endswith("_seq'::regclass)"):
+                    dpg.add_input_text(label="", hint="(Primary Key)", readonly=True, width=100)
+                elif pupillae[table] != None and col_details.get('default_value') == "FK":
+                    dpg.add_input_text(label="(Foreign Key)", hint="(auto)", width=100)
+                else:
+                    dpg.add_input_int(label="", step=0, width=85)
             if col_details['type'] == "varchar":
                 dpg.add_input_text(label="", width=250)
             win_id_dict[table]["fields"][column] = dpg.last_item()
@@ -154,7 +172,9 @@ for table, columns in pupillae.items():
 # test_list = dpg.get_item_children(33)[1]
 # for i in test_list:
 #     print(dpg.get_item_configuration(i))
-# print(win_id_dict)
+
+#print(win_id_dict)
+# print(pupillae)
 
 # Viewport parameters.
 dpg.setup_viewport()
