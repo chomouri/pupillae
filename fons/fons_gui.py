@@ -28,11 +28,10 @@ conn = psycopg2.connect(**fons)
 
 # As luck would have it, the default tables are best sorted alphabetically
 TABLES = sorted(fons_pg.get_tables(conn))
-FOREIGN_KEYS = fons_pg.get_fk_details(conn)
+fkey_dict = fons_pg.get_fk_details(conn)
 pupillae = {}
 for table in TABLES:
     col_details = map(list, fons_pg.get_col_details(conn, table))
-
     table_name = [table]
     table_values = {}
     for detail in col_details:
@@ -43,15 +42,15 @@ for table in TABLES:
     table_values = [table_values]
     pupillae.update(zip(table_name, table_values))
 # print("full dict:", pupillae)
-for row in FOREIGN_KEYS.values():
+for row in fkey_dict.values():
     for table in pupillae.keys():
         if row["fk_column"] in pupillae[table].keys() and row["foreign_table"] == table:
             pupillae[table][row["fk_column"]]["default_value"] = "FK"
             print("FK found in:", table, "->", row["fk_column"])
-
-if conn is not None:
-    conn.close()
-    print("Database connection closed.")
+#
+# if conn is not None:
+#     conn.close()
+#     print("Database connection closed.")
 
 # This should use the comm_id_dict and the IDs stored for the SUBMIT/REFRESH button.
 def delete_image_buttons():
@@ -95,7 +94,7 @@ def select_image(sender, app_data, user_data):
     add_selected_image_buttons()
     return
 
-def submit_psql(sender, app_data, user_data):
+def compose_p_sql(sender, app_data, user_data):
     query_dict = {}
     for table, value in win_id_dict.items():
         query_dict[table] = {}
@@ -104,12 +103,12 @@ def submit_psql(sender, app_data, user_data):
             query_dict[table][column] = dpg.get_value(id)
             # print("COLUMN =", column, "ID = ", id)
             # print("VALUE =", dpg.get_value(id))
-    pg_response = fons_pg.compose_psql(query_dict)
+    pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict)
     print(pg_response)
     dpg.set_item_label(comm_id_dict.get("READY"), "SUCCESS")
     delete_image_buttons()
 
-def refresh_psql(sender, app_data, user_data):
+def refresh_p_sql(sender, app_data, user_data):
     dpg.set_item_label(comm_id_dict.get("READY"), "READY")
 
 with dpg.file_dialog(
@@ -124,11 +123,11 @@ with dpg.window(label="Photo", id=photo_window, width=410, height=260):
     with dpg.menu_bar():
         with dpg.menu(label="File"):
             dpg.add_menu_item(label="Find...", callback=lambda: dpg.show_item(file_dialog_id))
-    dpg.add_button(label="SUBMIT", width=410, height=50, callback=submit_psql)
+    dpg.add_button(label="SUBMIT", width=410, height=50, callback=compose_p_sql)
     comm_id_dict["SUBMIT"] = dpg.last_item()
     dpg.add_button(label="READY", width=410, height=50)
     comm_id_dict["READY"] = dpg.last_item()
-    dpg.add_button(label="REFRESH", width=410, height=50, callback=refresh_psql)
+    dpg.add_button(label="REFRESH", width=410, height=50, callback=refresh_p_sql)
     comm_id_dict["REFRESH"] = dpg.last_item()
 
 # Show PG Insert Tables:
@@ -157,9 +156,9 @@ for table, columns in pupillae.items():
                 dpg.add_checkbox(label="")
             if col_details['type'] == "int4":
                 if col_details.get('default_value') != None and col_details.get('default_value').endswith("_seq'::regclass)"):
-                    dpg.add_input_text(label="", hint="(Primary Key)", readonly=True, width=100)
+                    dpg.add_input_text(label="", default_value="(Primary Key)", readonly=True, width=100)
                 elif pupillae[table] != None and col_details.get('default_value') == "FK":
-                    dpg.add_input_text(label="(Foreign Key)", hint="(auto)", width=100)
+                    dpg.add_input_text(label="(Foreign Key)", default_value="(auto)", width=100)
                 else:
                     dpg.add_input_int(label="", step=0, width=85)
             if col_details['type'] == "varchar":
@@ -173,12 +172,19 @@ for table, columns in pupillae.items():
 # for i in test_list:
 #     print(dpg.get_item_configuration(i))
 
-#print(win_id_dict)
-# print(pupillae)
+print(win_id_dict)
+print(pupillae)
 
 # Viewport parameters.
 dpg.setup_viewport()
 dpg.set_viewport_title("Fons: PostgreSQL")
 dpg.set_viewport_width(1300)
 dpg.set_viewport_height(700)
-dpg.start_dearpygui()
+try:
+    dpg.start_dearpygui()
+except (Exception, psycopg2.DatabaseError, psycopg2.Error) as e:
+    print(e)
+finally:
+    if conn is not None:
+        conn.close()
+        print("Database connection closed.")
