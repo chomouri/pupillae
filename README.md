@@ -41,9 +41,12 @@ Fix up fons_gui.py:
 	- Poss keep png format, check storing image as bytea in postgres and decode with discbot.
 - Validate photo_path and other paths; create folders if needed.
 - Make a class for the database structure instead of a dict(?), (and move it to fons_pg(?))
-conn.commit() IS REQUIRED in current implementation of cur.execute functions
+
 
 fons_pg has python str concat in get_col_details(). ?
 ^ Line 70: sql.Literal(table_str)
 submit_p_sql
 conn.commit() IS REQUIRED in current implementation of cur.execute INSERT functions
+- Create a function to ensure that the Parent Table is inserted before any Descendant Table. The fk_dict can be used for this but currently the tables are alphabetical and get sorted() anyway.
+
+- pupillae DB tables can only have one PK and one FK. Composite keys are not supported.

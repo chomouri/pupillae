@@ -27,6 +27,7 @@ fons = fons_pg.connect("fons_pg")
 conn = psycopg2.connect(**fons)
 
 # As luck would have it, the default tables are best sorted alphabetically
+print("Building GUI dictionaries from database...")
 TABLES = sorted(fons_pg.get_tables(conn))
 fkey_dict = fons_pg.get_fk_details(conn)
 pupillae = {}
@@ -47,10 +48,6 @@ for row in fkey_dict.values():
         if row["fk_column"] in pupillae[table].keys() and row["foreign_table"] == table:
             pupillae[table][row["fk_column"]]["default_value"] = "FK"
             print("FK found in:", table, "->", row["fk_column"])
-#
-# if conn is not None:
-#     conn.close()
-#     print("Database connection closed.")
 
 # This should use the comm_id_dict and the IDs stored for the SUBMIT/REFRESH button.
 def delete_image_buttons():
@@ -98,14 +95,14 @@ def compose_p_sql(sender, app_data, user_data):
     query_dict = {}
     for table, value in win_id_dict.items():
         query_dict[table] = {}
-        # print("TABLE =", table, "ID =", value["id"])
         for column, id in value["fields"].items():
             query_dict[table][column] = dpg.get_value(id)
-            # print("COLUMN =", column, "ID = ", id)
-            # print("VALUE =", dpg.get_value(id))
     pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict)
     print(pg_response)
-    dpg.set_item_label(comm_id_dict.get("READY"), "SUCCESS")
+    dpg.set_item_label(comm_id_dict.get("READY"), "SUBMITTED")
+    # Show Submitted SQL:
+    for submission, response in pg_response.items():
+        dpg.set_value(comm_id_dict.get(f"{submission} response:"), response)
     delete_image_buttons()
 
 def refresh_p_sql(sender, app_data, user_data):
@@ -137,8 +134,9 @@ for table, columns in pupillae.items():
     default_coord = (410, 0)
     column_counter = 0
     max_display_col = 2
-    win_height = 50+(30*len(columns)/2)
-    with dpg.window(label=table, width=890, height=win_height, pos=[default_coord[0], prev_win_height]):
+    win_height = 80+(30*len(columns)/2)
+    win_width = 890
+    with dpg.window(label=table, width=win_width, height=win_height, pos=[default_coord[0], prev_win_height]):
         prev_win_height += win_height
         win_id_dict[table] = {}
         win_id_dict[table]["id"] = dpg.last_item()
@@ -150,7 +148,7 @@ for table, columns in pupillae.items():
         win_id_dict[table]["fields"] = {}
         for column, col_details in columns.items():
             column_counter += 1
-            dpg.add_text(f"{column}", wrap=800)
+            dpg.add_text(f"{column}", wrap=win_width-10)
             dpg.add_same_line()
             if col_details['type'] == "bool":
                 dpg.add_checkbox(label="")
@@ -166,14 +164,21 @@ for table, columns in pupillae.items():
             win_id_dict[table]["fields"][column] = dpg.last_item()
             if column_counter % max_display_col:
                 dpg.add_same_line()
+        # Assuming max_display_col == 2:
+        dpg.add_dummy()
+        dpg.add_text("", label="Line_Break")
+        dpg.add_text(f" {table} INSERT:  ")
+        dpg.add_same_line()
+        dpg.add_text(f"WAITING...")
+        comm_id_dict[f"{table} response:"] = dpg.last_item()
 
 # print(dpg.get_item_children(33))
 # test_list = dpg.get_item_children(33)[1]
 # for i in test_list:
 #     print(dpg.get_item_configuration(i))
 
-print(win_id_dict)
-print(pupillae)
+#print(win_id_dict)
+#print(pupillae)
 
 # Viewport parameters.
 dpg.setup_viewport()
@@ -181,6 +186,7 @@ dpg.set_viewport_title("Fons: PostgreSQL")
 dpg.set_viewport_width(1300)
 dpg.set_viewport_height(700)
 try:
+    print("Starting GUI...")
     dpg.start_dearpygui()
 except (Exception, psycopg2.DatabaseError, psycopg2.Error) as e:
     print(e)

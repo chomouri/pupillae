@@ -111,6 +111,10 @@ def get_col_details(conn, table_str):
     return col_details
 
 def submit_p_sql(conn, query_dict, fk_dict):
+    message = ""
+    submitted_p_sql = {}
+    base_model_pk = None
+
     # Convert empty strings to None
     for table, column in query_dict.items():
         primary_keys = []
@@ -118,15 +122,17 @@ def submit_p_sql(conn, query_dict, fk_dict):
         foreign_keys = []
         for field, value in column.items():
             if value == "(Primary Key)":
-                # Record Key to delete from Insert Query
+                # Record Key to delete from query_dict and use in confirm_insert query.
                 primary_keys.append(field)
+                print(f"Primary Key Found in {table}: {primary_keys[0]}")
             if value == "(auto)":
-                print("F-Key Found")
-                column.update({field : None})# INSERT FK IN NEXT CODE BLOCK
+                print(f"Auto Foreign Key Found: Updating to: {base_model_pk}")
+                column.update({field : base_model_pk})
                 foreign_keys.append(field)
             if value == "":
                 column.update({field : None})
         for p_k in primary_keys:
+            # This p_k variable is referenced in the insert query and confirm_insert query.
             del column[p_k]
         table_names = list(column.keys())
         table_values = tuple(column.values())
@@ -134,53 +140,42 @@ def submit_p_sql(conn, query_dict, fk_dict):
             sql.Identifier(table),
             sql.SQL(', ').join(map(sql.Identifier, table_names)),
             sql.SQL(', ').join(sql.Placeholder() * len(table_names)),
-            # Use p_k instead of doing it properly with fk_dict
+            # For now, use p_k instead of doing it properly with fk_dict
             sql.Identifier(p_k))
-        print("Note Key ^^^")
 
         try:
             cur = conn.cursor()
             cur.execute(insert_query, table_values)
+            returned_pk = cur.fetchone()
             conn.commit()
-            print(cur.fetchall())
+            if base_model_pk == None:
+                base_model_pk = returned_pk
+
+            cur.execute(sql.SQL(
+                "SELECT * FROM {} WHERE {} = (%s)"
+                    ).format(sql.Identifier(table),
+                        sql.Identifier(primary_keys[0])
+                        ), returned_pk)
+            confirm_insert = cur.fetchone()
+            submitted_p_sql[table] = confirm_insert
             cur.close()
         except psycopg2.Error as e:
             print(e)
-
-    # print("COMPOSING...", query_dict)
-    # print(fk_dict)
-    for constraint, details in fk_dict.items():
-        for description, value in details.items():
-            # psuedo code:
-            """
-            SELECT fk_dict[constraint]['pk_column']
-              FROM fk_dict[constraint]['primary_table']
-            Use Latest or Previously Executed Cursor = saved_FK_value
-            INSERT INTO fk_dict[constraint]['foreign_table']
-              (fk_dict[constraint]['fk_column']) VALUES saved_FK_value
-            """
-        print(f"TODO: Update foreign_table: {fk_dict[constraint]['foreign_table']}")
-
-    # connection.commit()
-    message = "SUCCESS-- kinda"
-    return message
-
-
+    return submitted_p_sql
 
 
 if __name__ == '__main__':
-    fons = connect("fons_pg")
-    conn = psycopg2.connect(**fons)
 
-    query_dict = {'manufactors': {'m_id': '(Primary Key)', 'code': None, 'material': "METAL", 'company': "CITADEL", 'model_range': "WFB", 'company': "ffdrh", 'year_prod': "DWARF", 'm_name': None}, 'modifactors': {'p_id': '(Primary Key)', 'm_id': "(auto)", 'base': None, 'based': False, 'painted': 4, 'modded': False, 'artist': "ME", 'p_name': None, 'p_location': None, 'photo': "/HOME/PHOTO.JPG", 'm_class': None, 'm_arms': "SWORD", 'm_armor': "LEATHER", 'm_race': "HUMAN", 'm_type': None}}
+    query_dict = {'modifactors': {'p_id': '(Primary Key)', 'm_id': 53, 'base': "20mm S", 'based': True, 'painted': 4, 'modded': True, 'artist': "ME", 'p_name': None, 'p_location': None, 'photo': "/HOME/PHOTO2.JPG", 'm_class': None, 'm_arms': "SPEAR", 'm_armor': "LEATHER", 'm_race': "ELF", 'm_type': None}}
 
-
-    fk_dict = get_fk_details(conn)
+#
 
     try:
         fons = connect("fons_pg")
         conn = psycopg2.connect(**fons)
-        submit_p_sql(conn, query_dict, fk_dict)
+        fk_dict = get_fk_details(conn)
+        print("FK_DICT:", fk_dict)
+        # submit_p_sql(conn, query_dict, fk_dict)
     except psycopg2.Error as e:
         print(e)
     finally:
