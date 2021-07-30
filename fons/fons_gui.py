@@ -93,16 +93,22 @@ def select_image(sender, app_data, user_data):
 
 def compose_p_sql(sender, app_data, user_data):
     query_dict = {}
+    submit_requested = False
     for table, value in win_id_dict.items():
-        query_dict[table] = {}
-        for column, id in value["fields"].items():
-            query_dict[table][column] = dpg.get_value(id)
-    pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict)
-    print(pg_response)
-    dpg.set_item_label(comm_id_dict.get("READY"), "SUBMITTED")
-    # Show Submitted SQL:
-    for submission, response in pg_response.items():
-        dpg.set_value(comm_id_dict.get(f"{submission} response:"), response)
+        if dpg.get_value(value["Submit"]):
+            query_dict[table] = {}
+            submit_requested = True
+            for column, id in value["fields"].items():
+                query_dict[table][column] = dpg.get_value(id)
+    if submit_requested:
+        pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict)
+        print(pg_response)
+        # Use pg_response values to save photo as m_id+p_id.jpg:
+        # Clear display picture window
+        dpg.set_item_label(comm_id_dict.get("READY"), "SUBMITTED")
+        # Show Submitted SQL:
+        for submission, response in pg_response.items():
+            dpg.set_value(comm_id_dict.get(f"{submission} response:"), response)
     delete_image_buttons()
 
 def refresh_p_sql(sender, app_data, user_data):

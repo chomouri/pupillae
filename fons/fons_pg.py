@@ -114,15 +114,16 @@ def submit_p_sql(conn, query_dict, fk_dict):
     message = ""
     submitted_p_sql = {}
     base_model_pk = None
+    # print("QUERY_DICT:", query_dict)
 
-    # Convert empty strings to None
+# Convert empty strings to None, pre-empt PK and FK variables
     for table, column in query_dict.items():
         primary_keys = []
         primary_key_counter = 0
         foreign_keys = []
         for field, value in column.items():
             if value == "(Primary Key)":
-                # Record Key to delete from query_dict and use in confirm_insert query.
+# Record Key to delete from query_dict and use in confirm_insert query
                 primary_keys.append(field)
                 print(f"Primary Key Found in {table}: {primary_keys[0]}")
             if value == "(auto)":
@@ -131,26 +132,27 @@ def submit_p_sql(conn, query_dict, fk_dict):
                 foreign_keys.append(field)
             if value == "":
                 column.update({field : None})
+# Remove primary key from insert query
         for p_k in primary_keys:
-            # This p_k variable is referenced in the insert query and confirm_insert query.
             del column[p_k]
+# Form Query
         table_names = list(column.keys())
         table_values = tuple(column.values())
         insert_query = sql.SQL("INSERT INTO {} ({}) VALUES ({}) RETURNING {}").format(
             sql.Identifier(table),
             sql.SQL(', ').join(map(sql.Identifier, table_names)),
             sql.SQL(', ').join(sql.Placeholder() * len(table_names)),
-            # For now, use p_k instead of doing it properly with fk_dict
-            sql.Identifier(p_k))
-
+            sql.Identifier(primary_keys[0]))
+# Insert query
         try:
             cur = conn.cursor()
             cur.execute(insert_query, table_values)
             returned_pk = cur.fetchone()
             conn.commit()
+
             if base_model_pk == None:
                 base_model_pk = returned_pk
-
+# Fetch SQL Insert
             cur.execute(sql.SQL(
                 "SELECT * FROM {} WHERE {} = (%s)"
                     ).format(sql.Identifier(table),
