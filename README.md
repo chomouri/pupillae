@@ -48,5 +48,13 @@ fons_pg has python str concat in get_col_details(). ?
 submit_p_sql
 conn.commit() IS REQUIRED in current implementation of cur.execute INSERT functions
 - Create a function to ensure that the Parent Table is inserted before any Descendant Table. The fk_dict can be used for this but currently the tables are alphabetical and get sorted() anyway.
+- fill out fons_gui section with window sizes
 
 - pupillae DB tables can only have one PK and one FK. Composite keys are not supported.
+
+fons_img.py
+- A Statement Context Manager for tempory files/directories would be good.
+	ref: https://docs.python.org/3/reference/datamodel.html#context-managers
+	https://docs.python.org/3/library/tempfile.html
+- configparser is suddenly turning the tuple value (400, 400) into a string. Workaround: separate (int(x), int(y)).
+- os.mkdir is needed in places. 
