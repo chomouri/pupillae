@@ -12,21 +12,16 @@ fons - (i.e. god of wells and springs, Font of Knowledge) Create or enter data.
 		^ fons_gui.py: DearPyGui.
 	- Create randomised data for characters, settlements, and land, etc.
 
-
 pales - (i.e. god of shepherds and flocks) Parse the data and package it for viewing in some manner.
 	pupil: View database entries.
 	- Discord bot scripts
 	- Creating HTML formats for websites
 
 TODO:
-Change all these variable/function names from psql since that is a cli for postgres and we're not doing psql -_- ...
 Current paths are dicey, especially for connecting to the postgres server via database.ini:
 1) cd to pupillae.
 2) source ./venv/bin/activate
 3) python3 /pales/disc_bot.py
-
-./conf/config.py contains a hardcoded relative path. --fix with os.path
-check schema permissions on pgAdmin for fons
 
 General "except psycopg2.Error as e:
 	print(e)" is not great. Fix this so it works as part of the return message.
@@ -53,8 +48,9 @@ conn.commit() IS REQUIRED in current implementation of cur.execute INSERT functi
 - pupillae DB tables can only have one PK and one FK. Composite keys are not supported.
 
 fons_img.py
-- A Statement Context Manager for tempory files/directories would be good.
+- A Statement Context Manager for temporary files/directories would be good.
 	ref: https://docs.python.org/3/reference/datamodel.html#context-managers
 	https://docs.python.org/3/library/tempfile.html
 - configparser is suddenly turning the tuple value (400, 400) into a string. Workaround: separate (int(x), int(y)).
-- os.mkdir is needed in places. 
+- os.mkdir is needed in places.
+- General Robustness is needed.
