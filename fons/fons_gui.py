@@ -14,6 +14,8 @@ photo_window = dpg.generate_uuid()
 
 # Global variables, config.py params, postgres details
 gui_params = config.config(section="fons_gui")
+logs = {}
+log_template = {"insert": "alpha format"}
 comm_id_dict = {}
 win_id_dict = {}
 pupillae = {}
@@ -67,7 +69,7 @@ def compose_p_sql(sender, app_data, user_data):
 
     if submit_requested:
         print("Submitting query...")
-        pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict, gui_params["log_dir"])
+        pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict, logs["insert"])
 # Show Submitted SQL:
         for submission, response in pg_response.items():
             dpg.set_value(comm_id_dict.get(f"{submission} response:"), response)
@@ -84,6 +86,10 @@ def compose_p_sql(sender, app_data, user_data):
 
 print("Initialising directory structure...")
 config.initialise_dirs(gui_params)
+print("Initialising logs...")
+print(gui_params["log_dir"], log_template)
+logs = config.initialise_logs(gui_params["log_dir"], log_template)
+
 
 # As luck would have it, the default tables are best sorted alphabetically
 print("Building GUI dictionaries from database...")

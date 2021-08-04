@@ -1,4 +1,5 @@
 # Connection and Database functions for fons
+from datetime import datetime
 import psycopg2
 from psycopg2 import sql
 from conf import config
@@ -110,7 +111,7 @@ def get_col_details(conn, table_str):
         print(e)
     return col_details
 
-def submit_p_sql(conn, query_dict, fk_dict, log):
+def submit_p_sql(conn, query_dict, fk_dict, log_file):
     message = ""
     submitted_p_sql = {}
     base_model_pk = None
@@ -160,33 +161,19 @@ def submit_p_sql(conn, query_dict, fk_dict, log):
                         ), returned_pk)
             confirm_insert = cur.fetchone()
             submitted_p_sql[table] = confirm_insert
+            log_insert(log_file, table, returned_pk, insert_query.as_string(cur), confirm_insert)
             cur.close()
         except psycopg2.Error as e:
             print(e)
     return submitted_p_sql
 
-def log_insert(psql_query):
-    print("Logging insert...")
+def log_insert(log_file, table, pk, query, values):
+    print("Logging insert... (alpha format)")
+    with open(log_file, 'a') as f:
+        f.write(f"'{table}_{pk}': ['{query}', {list(values)}],\n")
 
 def log_error(psql_query):
-    print("Logging error...")
+    print("Logging errors not implemented...")
 
 
-if __name__ == '__main__':
-
-    query_dict = {'modifactors': {'p_id': '(Primary Key)', 'm_id': 53, 'base': "20mm S", 'based': True, 'painted': 4, 'modded': True, 'artist': "ME", 'p_name': None, 'p_location': None, 'photo': "/HOME/PHOTO2.JPG", 'm_class': None, 'm_arms': "SPEAR", 'm_armor': "LEATHER", 'm_race': "ELF", 'm_type': None}}
-
-#
-
-    try:
-        fons = connect("fons_pg")
-        conn = psycopg2.connect(**fons)
-        fk_dict = get_fk_details(conn)
-        print("FK_DICT:", fk_dict)
-        # submit_p_sql(conn, query_dict, fk_dict)
-    except psycopg2.Error as e:
-        print(e)
-    finally:
-        if conn is not None:
-            conn.close()
-            print("Database connection closed.")
+#if __name__ == '__main__':
