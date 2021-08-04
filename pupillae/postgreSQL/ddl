@@ -6,12 +6,12 @@ CREATE TABLE tablename (
 );
 ALTER SEQUENCE tablename_colname_seq OWNED BY tablename.colname;
 */
--- Create read-only user, make use to use a password that don't contain script delimitors or invalid characters:
-CREATE USER pupil WITH PASSWORD 'your_password';
-GRANT CONNECT ON DATABASE pupillae TO pupil;
-GRANT USAGE ON SCHEMA public TO pupil;
+-- Create read-only user, make use to use a password that doesn't contain script delimitors or invalid characters:
+CREATE USER pales WITH PASSWORD 'your_password';
+GRANT CONNECT ON DATABASE pupillae TO pales;
+GRANT USAGE ON SCHEMA public TO pales;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
-GRANT SELECT ON TABLES TO pupil;
+GRANT SELECT ON TABLES TO pales;
 
 -- ^^^ Repeat for "fons" user:
 
@@ -38,7 +38,7 @@ GRANT UPDATE, INSERT, DELETE, SELECT ON TABLE public.manufactors TO fons;
 
 GRANT ALL ON TABLE public.manufactors TO postgres;
 
-GRANT SELECT ON TABLE public.manufactors TO pupil;
+GRANT SELECT ON TABLE public.manufactors TO pales;
 
 -- DROP TABLE public.modifactors;
 
@@ -75,7 +75,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO fons
 
 GRANT ALL ON TABLE public.modifactors TO postgres;
 
-GRANT SELECT ON TABLE public.modifactors TO pupil;
+GRANT SELECT ON TABLE public.modifactors TO pales;
 
 ALTER TABLE modifactors ALTER COLUMN photo SET DEFAULT '(selected)';
 

@@ -1,20 +1,21 @@
 
-import random, re
+import random
+import re
 
 import discord
 
 import pupillae.fons.generator.dice_roller as dr
 import pupil
 
-from pupillae.conf import connect, config
+from pupillae.conf import config
+from pupillae.conf import connect
 
 client = discord.Client()
 
 @client.event
 async def on_ready():
     print("DISCORD: We have logged in as {0.user}".format(client))
-    connect.connect("pales_pg")
-    connect.connect("fons_pg")
+    conn = connect.connect(user="pales_pg", persist=False)
 
 @client.event
 async def on_message(message):
