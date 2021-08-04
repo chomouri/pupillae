@@ -110,7 +110,7 @@ def get_col_details(conn, table_str):
         print(e)
     return col_details
 
-def submit_p_sql(conn, query_dict, fk_dict):
+def submit_p_sql(conn, query_dict, fk_dict, log):
     message = ""
     submitted_p_sql = {}
     base_model_pk = None
@@ -164,6 +164,12 @@ def submit_p_sql(conn, query_dict, fk_dict):
         except psycopg2.Error as e:
             print(e)
     return submitted_p_sql
+
+def log_insert(psql_query):
+    print("Logging insert...")
+
+def log_error(psql_query):
+    print("Logging error...")
 
 
 if __name__ == '__main__':

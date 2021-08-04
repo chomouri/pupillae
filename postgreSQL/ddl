@@ -1,0 +1,83 @@
+--pupillae postgreSQL script
+/*TO DO:
+CREATE SEQUENCE tablename_colname_seq AS integer;
+CREATE TABLE tablename (
+    colname integer NOT NULL DEFAULT nextval('tablename_colname_seq')
+);
+ALTER SEQUENCE tablename_colname_seq OWNED BY tablename.colname;
+*/
+-- Create read-only user, make use to use a password that don't contain script delimitors or invalid characters:
+CREATE USER pupil WITH PASSWORD 'your_password';
+GRANT CONNECT ON DATABASE pupillae TO pupil;
+GRANT USAGE ON SCHEMA public TO pupil;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public
+GRANT SELECT ON TABLES TO pupil;
+
+-- ^^^ Repeat for "fons" user:
+
+-- Tables:
+-- DROP TABLE public.manufactors;
+CREATE TABLE IF NOT EXISTS public.manufactors
+(
+    m_id SERIAL PRIMARY KEY,
+    code character varying COLLATE pg_catalog."default",
+    material character varying COLLATE pg_catalog."default",
+    company character varying COLLATE pg_catalog."default",
+    model_range character varying COLLATE pg_catalog."default",
+    sculptor character varying COLLATE pg_catalog."default",
+    year_prod character varying(12) COLLATE pg_catalog."default",
+    m_name character varying COLLATE pg_catalog."default"
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.manufactors
+    OWNER to postgres;
+
+GRANT UPDATE, INSERT, DELETE, SELECT ON TABLE public.manufactors TO fons;
+
+GRANT ALL ON TABLE public.manufactors TO postgres;
+
+GRANT SELECT ON TABLE public.manufactors TO pupil;
+
+-- DROP TABLE public.modifactors;
+
+CREATE TABLE IF NOT EXISTS public.modifactors
+(
+    p_id SERIAL PRIMARY KEY,
+    m_id integer,
+    base character varying(20) COLLATE pg_catalog."default",
+    based boolean DEFAULT false,
+    painted integer,
+    modded boolean DEFAULT false,
+    artist character varying COLLATE pg_catalog."default",
+    p_name character varying COLLATE pg_catalog."default",
+    p_location character varying COLLATE pg_catalog."default",
+    photo character varying COLLATE pg_catalog."default",
+    m_class character varying COLLATE pg_catalog."default",
+    m_arms character varying COLLATE pg_catalog."default",
+    m_armor character varying COLLATE pg_catalog."default",
+    m_race character varying COLLATE pg_catalog."default",
+    m_type character varying COLLATE pg_catalog."default",
+    CONSTRAINT modifactors_m_id_fkey FOREIGN KEY (m_id)
+        REFERENCES public.manufactors (m_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.modifactors
+    OWNER to postgres;
+
+GRANT UPDATE, INSERT, DELETE, SELECT ON TABLE public.modifactors TO fons;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO fons
+
+GRANT ALL ON TABLE public.modifactors TO postgres;
+
+GRANT SELECT ON TABLE public.modifactors TO pupil;
+
+ALTER TABLE modifactors ALTER COLUMN photo SET DEFAULT '(selected)';
+
+ALTER TABLE modifactors
+ADD COLUMN squad_size int;

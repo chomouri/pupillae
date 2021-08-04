@@ -1,0 +1,40 @@
+INSERT INTO manufactors (code, material, company, model_range, sculptor, year_prod)
+VALUES
+(, , , , , , )
+('', , , , , , )
+(, , , , , , )
+(, , , , , , )
+(, , , , , , )
+RETURNING *;
+
+--INSERT INTO modifactors (m_id, m_name, base, painted, modded, artist, p_location, photo)
+--VALUES
+--(, , , , , , )
+--RETURNING *;
+
+--INSERT INTO sculpactors (p_id, m_class, m_arms, m_armor, m_race, m_type)
+--VALUES
+--(, , , , , )
+--RETURNING *;
+
+SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name LIKE '%facto%'
+
+-- manufactors
+1	"74384-1"	"Metal"	"Citadel"	"Warhammer Fantasy"	"Michael Perry"	"1993"	"Kragg the Grim"
+2	"020501301"	"Metal"	"Citadel"	"Warhammer Fantasy"	"Colin Dixon"		"Queen Helga"
+3	"020504203"	"Metal"	"Citadel"	"Warhammer Fantasy"			"Bolt Thrower Crew 3"
+4	"88010-6"	"Metal"	"Citadel"	"Warhammer Fantasy"			"Dwarf Command Champion 6"
+5	"RPR-77168"	"Plastic"	"Reaper"	"Bones"	"Ben Siens"		"Battleguard Golem"
+6	"RPR-77171"	"Plastic"	"Reaper"	"Bones"	"James Van Schaik"		"Stone Golem"
+7	"RPR-77220"	"Plastic"	"Reaper"	"Bones"	"Bobby Jackson"		"Herryk, Dwarf Cleric"
+8	"RPR-77413"	"Plastic"	"Reaper"	"Bones"	"Werner Klocke"		"Margara, Dwarf Shaman"
+
+-- sculpactors -
+1	1		"25mm"	true	2	false	"Unknown"	"Worchom"
+2	2		"25mm"	true	2	false	"Unknown"	"Worchom"
+3	3	"Looky Lou"	"25mm"	true	2	false	"Unknown"	"Worchom"
+4	4		"25mm"	true	2	false	"Unknown"	"Worchom"
+5	5	"John Wayne"	"40mm"	false	0	false		"Worchom"
+6	6	"Dwayne"	"40mm"	false	0	false		"Worchom"
+7	7		"25mm"	false	0	false		"Worchom"
+8	8		"25mm"	false	0	false		"Worchom"

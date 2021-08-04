@@ -67,12 +67,11 @@ def compose_p_sql(sender, app_data, user_data):
 
     if submit_requested:
         print("Submitting query...")
-        pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict)
+        pg_response = fons_pg.submit_p_sql(conn, query_dict, fkey_dict, gui_params["log_dir"])
 # Show Submitted SQL:
         for submission, response in pg_response.items():
             dpg.set_value(comm_id_dict.get(f"{submission} response:"), response)
 # Ideally, get the PK-FK values from the fk_dict for the image file name.
-# TODO: use format() and pad with leading zeros.
             if all(isinstance(i, int) for i in response[0:2]):
                 img_dict["table_pk_fk"] = response[0:2]
                 if photo_submitted:
@@ -83,6 +82,8 @@ def compose_p_sql(sender, app_data, user_data):
     dpg.set_item_label(comm_id_dict.get("image_status"), img_dict["status"])
     dpg.set_item_label(comm_id_dict.get("query_status"), "Select Image...")
 
+print("Initialising directory structure...")
+config.initialise_dirs(gui_params)
 
 # As luck would have it, the default tables are best sorted alphabetically
 print("Building GUI dictionaries from database...")
@@ -109,10 +110,11 @@ for row in fkey_dict.values():
 
 print("Initialising Image Dictionary...")
 img_dict = fons_img.process_photo(img_dict)
+print(img_dict["status"])
 
 print("Assembling Windows and Widgets..")
 with dpg.file_dialog(
-    label="Photo Selector", width=400, height=400, directory_selector=False, show=False, callback=display_scaled_image, default_path=gui_params["photo_path"]) as file_dialog_id:
+    label="Photo Selector", width=400, height=400, directory_selector=False, show=False, callback=display_scaled_image, default_path=gui_params["photo_path_dir"]) as file_dialog_id:
     dpg.add_file_extension(".*", color=(255, 255, 255, 255))
     dpg.add_file_extension(".png", color=(255, 255, 0, 255))
     dpg.add_file_extension(".cr2", color=(255, 0, 0, 255))
@@ -159,7 +161,7 @@ for table, columns in pupillae.items():
                 else:
                     dpg.add_input_int(label="", step=0, width=85)
             if col_details['type'] == "varchar":
-# This block will cause problems with default values.
+# This block will cause problems with other default values.
                 if pupillae[table] != None and col_details.get('default_value') == "'(selected)'::character varying":
                     dpg.add_input_text(label="(save to path...)", default_value="(selected)", width=250)
                 else:

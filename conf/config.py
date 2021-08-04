@@ -22,3 +22,13 @@ def config(filename='./conf/conf.ini', section='general'):
         raise Exception('Section {0} not found in the {1} file'.format(section, filename))
 
     return db
+
+def initialise_dirs(params):
+    for key in params.keys():
+        if str(key).endswith("_dir"):
+            try:
+                if not os.path.isdir(params[key]):
+                    os.makedirs(params[key])
+                print(f"{key} = {params[key]}")
+            except (Exception, PermissionError) as e:
+                print(e)

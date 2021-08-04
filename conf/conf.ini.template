@@ -15,8 +15,9 @@ password=
 
 [fons_gui]
 # Fully Qualified Directory Names
-photo_path=
+photo_path_dir=
 saved_img_dir=
+log_dir=
 
 [fons_img]
 # 400, 400 is suggested
