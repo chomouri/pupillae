@@ -2,7 +2,7 @@
 from datetime import datetime
 import psycopg2
 from psycopg2 import sql
-from conf import config
+from pupillae.conf import config
 
 def connect(user):
     """ Connect to the PostgreSQL database server """

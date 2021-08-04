@@ -5,7 +5,7 @@ import psycopg2
 import dearpygui.dearpygui as dpg
 from PIL import Image
 
-from conf import config
+from pupillae.conf import config
 import fons_pg
 import fons_img
 

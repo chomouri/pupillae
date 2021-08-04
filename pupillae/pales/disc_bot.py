@@ -3,10 +3,10 @@ import random, re
 
 import discord
 
-import fons.generator.dice_roller as dr
+import pupillae.fons.generator.dice_roller as dr
 import pupil
 
-from conf import connect, config
+from pupillae.conf import connect, config
 
 client = discord.Client()
 

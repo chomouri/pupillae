@@ -1,13 +1,3 @@
-# Jason Henson.
-# Nov 2020
-# Dice-Roller v1.-x
-
-# TODO:
-# Consolidate DiceRoller to one function and use kwargs.
-# Better yet: Make DiceRoller a new module.
-# So learn how to import modules better.
-
-# Python modules:
 import random
 import re
 

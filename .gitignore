@@ -1,11 +1,7 @@
-venv
 __pycache__
 conf.ini
 *wip/*
 */notes/*
 dist/*
+tests
 
-
-# Python egg metadata
-/*.egg-info
-/*.egg

@@ -4,7 +4,7 @@ from datetime import datetime
 from configparser import ConfigParser
 
 
-def config(filename='./conf/conf.ini', section='general'):
+def config(filename='./pupillae/conf/conf.ini', section='general'):
     # create a parser
     parser = ConfigParser()
     # read config file

@@ -3,7 +3,7 @@ from typing import Any, List, Optional, Tuple
 
 from PIL import Image
 
-from conf import config
+from pupillae.conf import config
 
 def scale_image(img_dict):
     temp_dir = img_dict.get("temp_img_dir")
@@ -57,5 +57,4 @@ def process_photo(img_dict):
         return img_dict
 
 
-if __name__ == '__main__':
-    print()
+#if __name__ == '__main__':

@@ -1,6 +1,19 @@
+[tool.poetry]
+name = "pupillae"
+version = "0.1.2"
+description = "A coven of tools for PnP RPGs"
+authors = ["chomouri <jason.matthew.henson@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+dearpygui = "^0.8.54"
+Pillow = "^8.3.1"
+"discord.py" = "^1.7.3"
+psycopg2 = "^2.9.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
