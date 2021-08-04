@@ -1,6 +1,7 @@
 #!/usr/bin/python
-from configparser import ConfigParser
 import os
+from datetime import datetime
+from configparser import ConfigParser
 
 
 def config(filename='./conf/conf.ini', section='general'):
@@ -32,3 +33,19 @@ def initialise_dirs(params):
                 print(f"{key} = {params[key]}")
             except (Exception, PermissionError) as e:
                 print(e)
+
+def initialise_logs(dir, types):
+    logs = {}
+    for type, template in types.items():
+        try:
+            now = datetime.now()
+            time_string = now.strftime("%Y-%m-%d_%H:%M_")
+            file_name = time_string + type + ".log"
+            log_file = os.path.join(dir, file_name)
+            with open(log_file, 'x') as f:
+                f.write(f"#{template}\n")
+            print(f"{type} = {log_file}")
+            logs[type] = log_file
+        except (Exception, FileExistsError, PermissionError) as e:
+            print(e)
+    return logs
