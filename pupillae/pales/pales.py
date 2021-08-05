@@ -4,4 +4,5 @@ def calldb():
     return "Not yet"
 
 def parse_db(db_query):
-    return db_query
+    results = f"You've searched for {db_query}."
+    return results
