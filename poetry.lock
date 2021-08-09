@@ -65,7 +65,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "dearpygui"
-version = "0.8.54"
+version = "0.8.53"
 description = "DearPyGui: A simple Python GUI Toolkit"
 category = "main"
 optional = false
