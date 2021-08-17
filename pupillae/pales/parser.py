@@ -73,9 +73,8 @@ def parse_f_dict(cur, query_dict, table_dict):
         op_not = ""
         column_side_complete = False
         for arg, a_value in p_value.items():
-            # print("2:", param, p_value, "\n", arg, a_value)
             for k, v in a_value.items():
-                print("3:", param, p_value, "\n", arg, a_value, "\n", k, v, "\n")
+                # print("note:", param, p_value, "\n", arg, a_value, "\n", k, v, "\n")
 # Evaluate the conditionals into column-side (SELECT/ORDER) and search-side (WHERE).
                 if not column_side_complete:
                     if k == 'COLUMN':
@@ -141,6 +140,5 @@ def parse_f_dict(cur, query_dict, table_dict):
     select_q = (qb.build_select(cur, table_dict))
     order_q = (qb.build_order(cur, order_dict))
     sql_query = select_q + where_q + order_q
-    return sql_query, where_dict
 
-    # return table_dict, select_list, order_dict, where_dict
+    return sql_query, where_dict

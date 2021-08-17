@@ -1,5 +1,9 @@
 List of Things to Do:
 
+General:
+error messages as returned by function exceptions.
+Some function returns are just "results" that have say "Error: etc"
+
 fons_gui:
 - "Rotate image" function.
 - crop function.
