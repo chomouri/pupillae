@@ -1,9 +1,8 @@
-
 [pales_pg]
-# ip, pupillae, pupil, password
+# ip, pupillae, pales, password
 host=
 database=pupillae
-user=pupil
+user=pales
 password=
 
 [fons_pg]
