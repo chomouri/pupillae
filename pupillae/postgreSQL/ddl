@@ -81,3 +81,6 @@ ALTER TABLE modifactors ALTER COLUMN photo SET DEFAULT '(selected)';
 
 ALTER TABLE modifactors
 ADD COLUMN squad_size int;
+
+ALTER TABLE modifactors
+ADD COLUMN squad_name varchar;

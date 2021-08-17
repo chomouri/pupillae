@@ -30,7 +30,7 @@ async def on_message(message) -> None:
 
     if message.content.startswith("$db "):
         db_query = message.content
-        response = pales.parse_db(db_query)
+        response = pales.query_db(db_query[4:])
         await message.channel.send(response)
 
     if message.content.startswith("$roll "):

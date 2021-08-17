@@ -1,0 +1,10 @@
+List of Things to Do:
+
+fons_gui:
+- "Rotate image" function.
+- crop function.
+- copy original photos into ~~/tmp and delete on scale.
+    ^ (???) this means that any photos in ~~/temp have not been saved to the database.
+
+bugs:
+- empty int fields persist previous value? see: squad_reps.
