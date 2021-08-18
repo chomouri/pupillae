@@ -59,8 +59,8 @@ def db_find(cur, db_query):
             return error
         if len(parsed) > 1:
             sql_query, execute_dict = parsed
-            print("--->", sql_query)
-            print("--->", execute_dict)
+            # print("--->", sql_query)
+            # print("--->", execute_dict)
             try:
                 cur.execute(sql_query, execute_dict)
                 results = cur.fetchall()
