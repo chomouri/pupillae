@@ -1,14 +1,93 @@
 List of Things to Do:
-
+--------
 General:
-error messages as returned by function exceptions.
-Some function returns are just "results" that have say "Error: etc"
+--------
+- error messages as returned by function exceptions.
+    ^ Some function returns are just "results" that have say "Error: etc"
+- Use markup to make READMEs readable, literally.
+    ^ Or disable the auto-markup github is using.
+    ^ Also: choose one type of extension (.rst, .md, ... .txt)
+- General Docstrings.
+    ^ Formatting type: NumPy/SciPy, or Google.
+- Type hints.
+- General tutorials, examples and guides.
 
+
+--------
+-- fons:
+--------
 fons_gui:
 - "Rotate image" function.
 - crop function.
 - copy original photos into ~~/tmp and delete on scale.
     ^ (???) this means that any photos in ~~/temp have not been saved to the database.
+- Convert png to jpg as part of scale_image()
+	^ Poss keep png format, check storing image as bytea in postgres and decode with discbot.
+- Make a class for the database structure instead of a dict(?), (and move it to fons_pg(?))
+- fons_pg has python str concat in get_col_details(). ? submit_p_sql()
+	^ Line 70: sql.Literal(table_str)
+	pales.query_builder also uses string methods to build queries. There are safeguards and it looks like it would require effort to mess things up.
+- Create a function to ensure that the Parent Table is inserted before any Descendant Table. The fk_dict can be used for this but currently the preferred table order is alphabetical and gets sorted() anyway.
+- fill out fons_gui section with window sizes
+- pupillae DB tables can only have one PK and one FK. Composite keys are not supported.
+- Currently submit_p_sql() uses "if all(isinstance(i, int) for i in response[0:2]):" and filters out the save_image function when m_id is None (i.e. when modif not submitted and (auto)FK in mod id).
+	^ Probably a checkbox in the mod id window.
 
-bugs:
-- empty int fields persist previous value? see: squad_reps.
+TODO:
+User Test #1-4:
+- Checkbox for deleting imported images once they are saved as model entries.
+- Yellow Highlight for input boxes that have been persisted from last entry,  Green Highlight for recently edited input.
+- Typing "(auto)" into m_id(FK) is silly. Use a checkbox.
+- Drop down suggestions for 10(?) most popular entries.
+    ^ Or Auto-completion.
+- m_id + p_id hex_file_name conversion displayed.
+- Editable/Updatable History.
+
+- Web scraping ?
+
+- Arrays in the database.
+**** ^-- THIS.
+
+** Do some searching of the database and see if these fields are suitable.
+- m_name should be "official_name", or "c_name" (for "company").
+
+********
+** bugs:
+********
+    - empty int fields persist previous value? see: squad_reps.
+
+
+fons_img.py
+- A Statement Context Manager for temporary files/directories would be good.
+	ref: https://docs.python.org/3/reference/datamodel.html#context-managers
+	https://docs.python.org/3/library/tempfile.html
+- configparser is suddenly turning the tuple value (400, 400) into a string. Workaround: separate (int(x), int(y)).
+- General Robustness is needed.
+
+TODO:
+User Test #1-4:
+- Consistent order of files in file dialog.  
+
+---------
+-- pales:
+---------
+disc_bot.py:
+- Shortcuts:
+    ^ A simple dictionary might be easiest:
+    {"$f ": "$db find "
+    , "$find ": "$db find"
+    , "$s ": "$db show "
+    , ...} -> if re.(\w) in shortcut_dict.keys(): value
+- Guide and tutorial for db communications and bot commands.
+    ^ Basic and advanced.
+
+pales.py:
+- The database will likely be calling some pretty big lists, so using offset and limits will need to be implemented.
+    ^ https://www.postgresql.org/docs/13/queries-limit.html
+- Hardcoded ext for jpg for saved_dir image upload.
+- Need to move conf.ini section because pales is very much not using fons_gui for this, ... although the images are intended to be exclusively saved by fons_gui.
+
+query_builder.py:
+- Regarding building dynamic queries with keyword variables, the following may be useful:
+https://www.psycopg.org/docs/advanced.html#adapting-new-types
+https://www.psycopg.org/docs/extensions.html#psycopg2.extensions.adapt
