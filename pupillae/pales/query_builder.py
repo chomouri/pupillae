@@ -37,17 +37,22 @@ INNER JOIN modifactors ON manufactors.m_id = modifactors.m_id
     return select_from
 
 def build_order(cur, order_dict):
-    """ Builds the ORDER BY statement using the order_dict's orientation values
+    """ Builds the ORDER BY and LIMIT/OFFSET statement using the
+    order_dict's orientation values.
 
     Notes: It appears that the columns from order_dict do not need to be quoted """
 
     order_list = []
     if len(order_dict) < 1:
-        order_by = 'ORDER BY "Model_ID" ASC;'
+        order_by = 'ORDER BY "Model_ID" ASC'
     else:
         for column, orientation in order_dict.items():
             order_list.append(f"{column} {orientation}")
         order_str = ", ".join(order_list)
-        order_str = f"""ORDER BY {order_str}, "Model_ID" ASC;"""
+        order_str = f"""ORDER BY {order_str}, "Model_ID" ASC"""
         order_by = sql.SQL(order_str).as_string(cur)
+    order_by += """
+LIMIT %(limit_current)s
+OFFSET %(offset_current)s;
+"""
     return order_by
