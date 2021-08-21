@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+from typing import Any, List, Optional, Tuple
 
 import psycopg2
 from psycopg2 import sql
@@ -25,20 +27,20 @@ def get_cols():
             table_dict[col].update(defaults)
     return table_dict
 
-def query_db(cur, db_query: str) -> str:
+def query_db(cur, db_query: str, offset: Optional[dict]):
     """ Determine the purpose of the query and calls the correct function """
     function, params = db_query[:4], db_query[5:]
     print(function, params)
     if function == "find":
-        results = db_find(cur, params)
+        results = db_find(cur, params, offset)
     # elif function == "stat":
     #     results = db_stat(cur, params)
     elif function == "show":
         results =  db_show(cur, params)
-    else: results = f"""Malformed query: Needs "$db find "."""
+    else: results = f"""Malformed query: Needs "$db find " or "$db show"."""
     return results
 
-def db_find(cur, db_query):
+def db_find(cur, db_query, offset_dict):
     """ Build a SQL query by sending the parameters to the appropriate function """
     error = None
     parsed = None
@@ -57,6 +59,8 @@ def db_find(cur, db_query):
             return error
         if len(parsed) > 1:
             sql_query, execute_dict = parsed
+# Update execute_dict with offset_dict values:
+            execute_dict.update(offset_dict)
             print("--->", sql_query)
             print("--->", execute_dict)
             try:

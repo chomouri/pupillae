@@ -24,6 +24,8 @@ scale_x=400
 scale_y=400
 temp_dir=
 
-[discord_tokens]
+[discord]
 bones_token=
 test_bot_token=
+message_max=2000
+search_max=10
