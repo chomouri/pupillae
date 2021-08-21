@@ -63,8 +63,6 @@ async def on_message(message) -> None:
         error = None
 
         try:
-# Slow connection rate for db: YMMV
-            time.sleep(2)
             conn = connect.connect(user="pales_pg", persist=True)
             cur = conn.cursor()
             response = pales.query_db(cur, db_query[4:], offset=offset_dict)
@@ -128,8 +126,6 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
             saved_offset["offset_current"] = saved_offset["offset_current"] + saved_offset["limit_current"]
 
             try:
-# Slow connection rate for db: YMMV
-                time.sleep(2)
                 conn = connect.connect(user="pales_pg", persist=True)
                 cur = conn.cursor()
                 response = pales.db_find(cur, saved_query[8:], saved_offset)
