@@ -1,6 +1,7 @@
 import os
-import sys
 from typing import Any, List, Optional, Tuple
+import re
+import sys
 
 import psycopg2
 from psycopg2 import sql
@@ -59,10 +60,12 @@ def db_find(cur, db_query, offset_dict):
             return error
         if len(parsed) > 1:
             sql_query, execute_dict = parsed
+
 # Update execute_dict with offset_dict values:
             execute_dict.update(offset_dict)
             print("--->", sql_query)
             print("--->", execute_dict)
+
             try:
                 cur.execute(sql_query, execute_dict)
                 results = cur.fetchall()
@@ -74,11 +77,14 @@ def db_find(cur, db_query, offset_dict):
             return msg
 
 def db_show(cur, model_id):
-    img_params = config.config(section="fons_gui")
-    photo_dir = img_params["saved_img_dir"]
-    image = os.path.join(photo_dir, (model_id.upper() + ".JPG"))
-    print(image)
-    if os.path.isfile(image):
-        return f"Model ID: {model_id}||{image}"
-    else:
-        return f"Cannot find {model_id} photo"
+    """ Check for valid Model_ID. Return the full path of image requested """
+    model_id = model_id.upper()
+    if re.fullmatch(r'[0-9A-F]{4}_[0-9A-F]{4}', model_id):
+        img_params = config.config(section="fons_gui")
+        photo_dir = img_params["saved_img_dir"]
+        image = os.path.join(photo_dir, (model_id + ".JPG"))
+        if os.path.isfile(image):
+            return f"Model ID: {model_id}||{image}"
+        else:
+            return f"Cannot find {model_id} photo."
+    return f"{model_id} is not a valid Model ID. Use hex values in an XXXX_YYYY format."
