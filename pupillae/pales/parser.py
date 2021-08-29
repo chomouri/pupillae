@@ -98,6 +98,7 @@ def build_q_dict(query: str) -> dict:
                 token.type : str
                     with value:
                         token.value
+    OR (fix with Raises)
     str : parser.PalesError
         Uses .detail as error message.
 
@@ -140,7 +141,7 @@ def parse_f_dict(cur, query_dict: dict, table_dict: dict) -> Tuple[str, Dict]:
         the value of token.value to form a dictionary for the second
         argument in the psycopg execute() method. This dictionary is
         exclusively for the WHERE clauses in the SQL query.
-    OR
+    OR (fix with Raises)
     str : parser.PalesError
         Uses .detail as error message.
 

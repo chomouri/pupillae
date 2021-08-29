@@ -1,5 +1,6 @@
 # Connection and Database functions for fons
 from datetime import datetime
+from typing import Dict, List
 import psycopg2
 from psycopg2 import sql
 from pupillae.conf import config
@@ -36,7 +37,8 @@ def connect(user):
         print(error)
     return
 
-def get_tables(conn):
+def get_tables(conn) -> List[str]:
+    """Get a list of tables from the database."""
     table_names = []
     try:
         cur = conn.cursor()
@@ -48,7 +50,20 @@ def get_tables(conn):
             print(e)
     return table_names
 
-def get_fk_details(conn):
+def get_fk_details(conn) -> dict:
+    """Get a dict of primary/foreign keys from the database.
+
+    Returns
+    -------
+    `fk_dict` : dict
+        Forms a dict with the following keys:
+            "foreign_table",
+            "primary_table",
+            "no",
+            "fk_column",
+            "pk_column",
+            "constraint_name"
+    """
     fk_dict = {}
     fk_headers = ("foreign_table", "primary_table", "no", "fk_column", "pk_column", "constraint_name")
     try:
@@ -86,7 +101,8 @@ order by kcu.table_name,
         fk_dict.update(zip(row, fk_values))
     return fk_dict
 
-def get_table_col_names(conn, table_str):
+def get_table_col_names(conn, table_str: str) -> List[str]:
+    """Get column names from the database."""
     col_names = []
     query = sql.SQL("SELECT * FROM {table}").format(
         table = sql.Identifier(table_str))
@@ -100,7 +116,14 @@ def get_table_col_names(conn, table_str):
         print(e)
     return col_names
 
-def get_col_details(conn, table_str):
+def get_col_details(conn, table_str: str) -> List[Any]:
+    """Get column details from the database.
+
+    Returns
+    -------
+    `col_details` : List[Any]
+        column_name, udt_name, character_maximum_length, column_default
+    """
     col_details = []
     try:
         cur = conn.cursor()
@@ -111,7 +134,18 @@ def get_col_details(conn, table_str):
         print(e)
     return col_details
 
-def submit_p_sql(conn, query_dict, fk_dict, log_file):
+def submit_p_sql(conn, query_dict: dict, fk_dict: dict, log_file: str) -> dict:
+    """Use `query_dict`, `fk_dict` to compile and insert SQL.
+
+    Returns
+    -------
+    submitted_p_sql : dict
+        key : str
+            table name
+        value :
+            psycopg cursor fetch results
+
+    """
     message = ""
     submitted_p_sql = {}
     base_model_pk = None
@@ -168,11 +202,13 @@ def submit_p_sql(conn, query_dict, fk_dict, log_file):
     return submitted_p_sql
 
 def log_insert(log_file, table, pk, query, values):
+    """Stand-in logging function."""
     print("Logging insert... (alpha format)")
     with open(log_file, 'a') as f:
         f.write(f"'{table}_{pk}': ['{query}', {list(values)}],\n")
 
 def log_error(psql_query):
+    """Stand-in logging function (Not Implemented)."""
     print("Logging errors not implemented...")
 
 
