@@ -1,11 +1,30 @@
-import os, sys
-from typing import Any, List, Optional, Tuple
+import os
+import sys
+from typing import Any, Dict, Tuple, Union
 
 from PIL import Image
 
 from pupillae.conf import config
 
-def scale_image(img_dict):
+def scale_image(img_dict: Dict[str, Union[str, Tuple[int, int]]]) -> Union[str, Any]:
+    """Scales image according to kwargs.
+
+    Parameters
+    ----------
+    `img_dict` : dict
+
+    Returns
+    -------
+    `status`: str
+    `scaled_image`: str
+        Path
+
+    Raises
+    ------
+    Exception
+        Returns [string, None]
+
+    """
     temp_dir = img_dict.get("temp_img_dir")
     outfile = os.path.join(temp_dir, os.path.basename(img_dict["selected_image"]))
     try:
@@ -19,7 +38,23 @@ def scale_image(img_dict):
         scaled_image = None
     return status, scaled_image
 
-def save_image(img_dict):
+def save_image(img_dict: Dict[str, Union[str, Tuple[int, int]]]) -> str:
+    """Save image according to kwargs.
+
+    Parameters
+    ----------
+    `img_dict` : dict
+
+    Returns
+    -------
+    `status`: str
+
+    Raises
+    ------
+    Exception
+        Returns [string]
+
+    """
     try:
         _, ext = os.path.splitext(img_dict["scaled_image"])
         new = os.path.join(img_dict["saved_img_dir"], (img_dict["hex_file_name"] + ext))
@@ -32,7 +67,18 @@ def save_image(img_dict):
         status = f"Error: Cannot save file."
     return status
 
-def process_photo(img_dict):
+def process_photo(img_dict: Dict[str, str]) -> Dict[str, Union[str, Tuple[int, int]]]:
+    """Update `img_dict`, save/scale image according to kwargs.
+
+    Parameters
+    ----------
+    `img_dict` : dict
+
+    Returns
+    -------
+    `img_dict`: dict
+
+    """
     if img_dict["status"] == "setup_req":
         img_params = config.config(section="fons_img")
         config.initialise_dirs(img_params)

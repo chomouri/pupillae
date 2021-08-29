@@ -1,10 +1,31 @@
-#!/usr/bin/python
-import os
-from datetime import datetime
 from configparser import ConfigParser
+from datetime import datetime
+import os
+from typing import Any, Dict
 
+def config(filename: str = './pupillae/conf/conf.ini', section: str = 'general'
+    ) -> Dict[str, str]:
+    """Use conf.ini section to build dictionary of parameters.
 
-def config(filename='./pupillae/conf/conf.ini', section='general'):
+    Parameters
+    ----------
+    filename : str, optional (default: './pupillae/conf/conf.ini')
+        Path
+    section : str, optional (default: 'general')
+        The section of `filename` to use for parameter dictionary.
+
+    Raises
+    ------
+    Exception
+        `filename` not found.
+        `section` not found.
+
+    Returns
+    -------
+    dict
+        [`filename` `section`]{**kwargs}
+    """
+
     # create a parser
     parser = ConfigParser()
     # read config file
@@ -24,7 +45,15 @@ def config(filename='./pupillae/conf/conf.ini', section='general'):
 
     return db
 
-def initialise_dirs(params):
+def initialise_dirs(params: Dict[str, str]) -> None:
+    """Validate or create directories
+
+    Parameters
+    ----------
+    params : dict
+        Relevant Keys: "*_dir"
+
+    """
     for key in params.keys():
         if str(key).endswith("_dir"):
             try:
@@ -34,7 +63,22 @@ def initialise_dirs(params):
             except (Exception, PermissionError) as e:
                 print(e)
 
-def initialise_logs(dir, types):
+def initialise_logs(dir: str, types: Dict[str, str]) -> Dict[str, str]:
+    """Create logs files
+
+    Parameters
+    ----------
+    dir : str
+        Path
+    types: Dict[str, str]
+        Format: {type: template}
+
+    Return
+    ------
+    dict
+        Format: {type: path}
+
+    """
     logs = {}
     for type, template in types.items():
         try:

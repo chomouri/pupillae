@@ -1,27 +1,66 @@
-from typing import NamedTuple
+from typing import NamedTuple, Tuple, Dict
 import re
 
 import query_builder as qb
 
 class Token(NamedTuple):
+    """A class used to define tokens for SQL queries.
+
+    Attributes
+    ----------
+    type : str
+        Human-readble name for the token (i.e. OP (operator), etc)
+    value : str
+        The literal value of the token (i.e. "-", etc)
+    index : int
+        The index of the character within the string slice. Strings
+        are sliced according the "END" token, as defined in
+        parser.build_q_dict. The Token.index is used in conjuction with
+        a "line" (slice) index as a unique reference for the named
+        arguments (%(name)s placeholders) in SQL execute commands
+    """
+
     type: str
     value: str
     index: int
 
 class PalesError:
+    """An attempt at universalising error messages across the module.
+
+    Attributes
+    ----------
+    detail : str
+        A human-readable description of the error
+
+    TODO:
+        Universalise the error codes and implement the PalesError class in
+        applicable functions.
+    """
+
     detail: str
 
-def tokenise(code):
+def tokenise(code: str) -> Token:
+    """Generator using regex to sort string slice into tokens.
+
+    Using the template provided from re python.docs, sort the slice
+    into components in a procedural manner. Additional operators can be written in this generator to adapt the tokeniser to your needs.
+
+    Yield
+    -----
+    class: parser.Token
+
+    See parser.tokeniser.token_specification
+    """
     token_specification = [
         ('END',         r';'),                          # Statement terminator
-        ('PRIORITY',    r'\d+(?=[^\d;]+=)'),             # Integer or decimal number
+        ('PRIORITY',    r'\d+(?=[^\d;]+=)'),            # Integer or decimal number
         ('COLUMN',      r"'[\w ]+'(?==)|[\w]+(?==)"),   # Word or quoted word
         ('INT',         r'\d+(?=[^\d]+;)'),        # Integer or decimal number
-        ('ASSIGN',      r'='),                          # Assignment operator
-        ('OP',          r'[\-/!^]'),                # Operators
+        ('ASSIGN',      r'='),                     # Assignment operator
+        ('OP',          r'[\-/!^]'),               # Operators
         ('STRING',      r"""['][\w \-%]+[']|["][\w \-'%]+["]|[\w%]+"""),  # Identifiers
-        ('SKIP',        r'[ \t\n\']'),           # Skip over spaces, tabs, calls
-        ('MISMATCH',    r'.'),                          # Any other character
+        ('SKIP',        r'[ \t\n\']'),              # Skip over spaces, tabs, calls
+        ('MISMATCH',    r'.'),                      # Any other character
     ]
     tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
     char_start = 0
@@ -40,7 +79,32 @@ def tokenise(code):
             continue
         yield Token(kind, value, index)
 
-def build_q_dict(query):
+def build_q_dict(query: str) -> dict:
+    """Sends `query` to be tokenised and nests results in a dict.
+
+    Parameters
+    ----------
+    query : str
+
+    Returns
+    -------
+    dict
+        The dictionary returned uses the following keys:
+        "line" (slice) index : int
+        Nested dict:
+            token.index : str
+                The character index of the token
+            Nested dict:
+                token.type : str
+                    with value:
+                        token.value
+    OR (fix with Raises)
+    str : parser.PalesError
+        Uses .detail as error message.
+
+    TODO:
+    Use Raise instead of Return for error messages.
+    """
     query_dict = {}
     param_counter = 0
     query_dict[param_counter] = {}
@@ -57,8 +121,34 @@ def build_q_dict(query):
             query_dict[param_counter] = {}
     return query_dict
 
-def parse_f_dict(cur, query_dict, table_dict):
-    """ Uses the query_dict and table_dict to prepare the find query"""
+def parse_f_dict(cur, query_dict: dict, table_dict: dict) -> Tuple[str, Dict]:
+    """ Uses the query_dict and table_dict to prepare the find query
+
+    Parameters
+    ----------
+    cur : psycopg.cursor
+    query_dict : dict
+        See: parser.build_q_dict()
+    table_dict : dict
+        See: pales.get_cols()
+
+    Returns
+    -------
+    str
+        SQL SELECT query psycopg.as_string format.
+    dict
+        Uses key of concat("line" (slice) number, character index)) and
+        the value of token.value to form a dictionary for the second
+        argument in the psycopg execute() method. This dictionary is
+        exclusively for the WHERE clauses in the SQL query.
+    OR (fix with Raises)
+    str : parser.PalesError
+        Uses .detail as error message.
+
+    TODO:
+    Use Raise instead of Return for error messages.
+    Use list and .join instead of +=.
+    """
     error = PalesError()
     where_q = ""
     where_dict = {}
@@ -74,7 +164,7 @@ def parse_f_dict(cur, query_dict, table_dict):
         column_side_complete = False
         for arg, a_value in p_value.items():
             for k, v in a_value.items():
-                # print("note:", param, p_value, "\n", arg, a_value, "\n", k, v, "\n")
+                # print("Note: Slice:", param, p_value, "\nArg:", arg, a_value, "\nToken:", k, v, "\n")
 # Evaluate the conditionals into column-side (SELECT/ORDER) and search-side (WHERE).
                 if not column_side_complete:
                     if k == 'COLUMN':

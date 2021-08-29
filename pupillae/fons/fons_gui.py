@@ -1,5 +1,6 @@
-# MVP
-import os, sys
+import os
+import sys
+from typing import Dict
 
 import psycopg2
 import dearpygui.dearpygui as dpg
@@ -22,15 +23,12 @@ pupillae = {}
 img_dict = {"status": "setup_req"}
 img_dict.update(gui_params)
 
-# Get postgreSQL tables and headers/details for each table, compose dictionary
-# Use a composite class for this in the future(?).
-# ^^^ ref: https://realpython.com/inheritance-composition-python/
-# ^^^ ref: https://docs.python.org/3/tutorial/classes.html
 fons = fons_pg.connect("fons_pg")
 conn = psycopg2.connect(**fons)
 
 
-def display_scaled_image(sender, app_data, user_data):
+def display_scaled_image(sender, app_data, user_data) -> None:
+    """Scales image, updates image button."""
     print("Scaling image...")
     global img_dict
     img_dict["selected_image"] = os.path.join(
@@ -50,7 +48,8 @@ def display_scaled_image(sender, app_data, user_data):
     dpg.set_item_label(
         comm_id_dict.get("image_status"), img_dict["status"])
 
-def compose_p_sql(sender, app_data, user_data):
+def compose_p_sql(sender, app_data, user_data) -> None:
+    """Compiles data for SQl formation."""
     global img_dict
     print("Composing SQL query...")
     query_dict = {}
