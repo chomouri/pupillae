@@ -1,1 +1,2 @@
-Need a gender descriptor.
+- Need a gender descriptor.
+- Desperately need arrays.
