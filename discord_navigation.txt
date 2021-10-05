@@ -1,0 +1,61 @@
+discord $db "docstring"
+This txt file uses Discord's markdown for underlining, bold, and italics, and can be pinned in a server to assist navigating the database via the discord bot.
+
+Advanced searching still needs a lot of work.
+
+Model Database Search:
+
+Searching the database for models is somewhat fickle.
+The basic syntax is:
+__$db__ (__operation__) {[*priority*][*show*][*descending*]}(__column__)**=**{[*like*][*not*][*or*]}(__search-word __){*...*}**;**
+
+Words in parenthesis are user defined. Underlined and Bold words are required. Italics are optional. Arguments in curly brackets can be in any order.
+
+__operation__ = Currently only "**find**" or "**show**" are able to be used.
+"stat" (to see most/least popular, number of "dwarves", what columns to search, etc) is still in the pipeline
+
+*priority* - "Any" number (integer)  -  Used to prioritise the order in which the results are displayed.
+*show* - !  - Results will include this column in the message. Model ID is always included.
+*descending* - ^ - Display results in reverse alphabetical/numeric (pretty useless at the moment).
+*not* -  -  - Results do not include the search-word.
+*or*  - / - Inclusive search.
+**=** and **;** - These are required so we don't search for a search-word as a column and to divide arguments so we don't use a column as a search-word.
+__column__ - The column in which to search
+__search-word __ - The word/s that we are searching for. Search-words with spaces and hyphens **must** be in quotes, as shown in examples.
+*%* is a wildcard; it is any length of any character.
+*_* is a wildcard; it is any single character.
+*...* - can be used to repeat the search with different search-words/operators for the same column.
+
+The order of operations that the database uses can trip up searching.
+Using "-" or "/" will require some practise. And some refinement in coding. 
+For reference:
+https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-PRECEDENCE
+
+Model Find examples:
+`$db find material=metal; !company=Citadel`
+Searches for all metal models by the company Citadel. Displays the Model ID and the company that made it.
+
+`$db find !m_race=%dwarf; !1m_arms=%crossbow%-'great axe'; !-m_armor=%shield%`
+Searches for all "[variation] dwarf" models (deep dwarf, zombie dwarf, hill dwarf, etc, but not "dwarf pony") that do not have a shield and are using any type of crossbow (light crossbow, heavy crossbow, etc, *as well as any weapon as well as a crossbow*), but not those that are *only* using a "great axe" (models only carrying a great axe don't have a crossbow, so that parameter is redundant. -'%great axe%' would be the way to phrase that query).
+Displays the Model ID, weapons and race on the model, and sorts it according to weapons (alphabetical) first, followed by armor, then reversed alphabetical race.
+
+`$db find !m_race=%dwarf; !1m_arms=%crossbow%-'%great axe%'; !-m_armor="%shield%""`
+Same as above but excludes models carrying "great axes" (but not "great-axe").
+
+Searchable Columns:
+"material" - Metal, plastic, Bones (Reaper's soft plastic), etc
+"company" - The company that made the model
+"m_name" - The official name as per manufacturer.
+"based" - True or False (whether or not the model is on a base (base_size not implemented yet)
+"painted" - scale of 0-5: 0 being unpainted, 3 being blocked, 4 being table-top quality and 5 being "actually ok"
+"m_class" - very generic (fighter, rogue, caster, bard). Monsters do not always have a class but humanoids generally do.
+"m_arms" - Needs consistency between weapons with spaces. "great axe" and "great-axe" are considered different things.
+"m_armor" - leather, scale, etc. Includes shields.
+"m_race" - human, dwarf, etc. Also rat, dragon, etc. Closer to "species".
+"m_type" - Monster, humanoid, beast...
+"squad_reps" - Number of near-exact replications in the "group". Used for WHFB army units but excluding Command characters.
+"squad_name" - Name of unit if model is part of a cohesive group (i.e. includes Command characters in the WHFB unit.
+
+Extra Notes:
+Model ID is formed of two parts: XXXX_YYYY, where XXXX is the manufacturer's model number and YYYY is the variation.
+For example, if two models are identical from a blister packet, they will have the same XXXX, but if a model is modified with a different weapon, or painted to be a different unit, they will have different YYYY values.
