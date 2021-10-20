@@ -88,6 +88,10 @@ disc_bot.py:
     , "$find ": "$db find"
     , "$s ": "$db show "
     , ...} -> if re.(\w) in shortcut_dict.keys(): value
+    OR: timeit
+    {"$db find" : ["$f", "$find", ...],
+    ...} -> for value in shortcut_dict.value():
+
 - Guide and tutorial for db communications and bot commands.
     ^ Basic and advanced.
 
