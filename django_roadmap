@@ -1,0 +1,47 @@
+First Step:
+Model Library. 
+
+Website, Django, Discord, Postgres.
+
+Discord Bot "sees" posts.
+If Post starts with "LOG" and user role == admin/dm:
+    Logs post as relevant in Postgres.
+
+If Django sees Post in Postgres, it gives admin user the ability to confirm the post as Canon.
+
+Django Website has two parameters:
+    Canon.
+    Prospective.
+
+Within each section, Django has the following information as Nav:
+    Locations.
+    Factions.
+    Characters.
+    Myths and Rumors.
+
+Locations:
+    Class (Region, Province, Town, etc).
+    Coordinates.
+    Population.
+    Description.
+    Services.
+    Notable Residents.
+    Lore.
+
+Factions:
+    Locations.
+    Description.
+    Notable Members.
+    Lore.
+
+Characters:
+    Locations.
+    Model.
+    Description.
+    Quotes.
+    Faction Relationships.
+    Lore.
+
+Myths and Rumors:
+    Title.
+    Content.

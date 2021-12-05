@@ -1,0 +1,39 @@
+Website, Django, Postgres.
+Model Library.
+
+Introduction page.
+    Stats:
+    // Use: Top 5 Most Popular, 3 Rarest. Ignore Nulls.
+        - Top 5 Companies
+        - Rarest 3 Companies
+        - Sculptors
+        - Year (Count)
+        - Year (Earliest 3, latest 3)
+        - m_type (i.e. Humanoid, fiend, ...)
+        - m_class
+        - m_arms
+        - m_armor
+        - m_race
+    Newest Model.
+    Random Unpainted Model.
+
+Nav:
+    Models by Sculptor:
+        - Nav list down side of Sculptors
+    Models by Year:
+        - Nav list down side of Years
+    Unpainted Models:
+        - Nav list down side of painted <= 2
+    Painted Models:
+        - Nav list down side of Painted >= 3
+
+Content/Gallery:
+    Thumbnail of photo.
+    if squad_name == NULL:
+        squad_name = "(Unaffiliated)"
+    if p_name != NULL:
+        title = p_name (squad_name)
+    else:
+        if m_name == NULL:
+            m-name == "Unknown Model!"
+            title = m_name (squad_name)
