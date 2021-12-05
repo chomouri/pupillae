@@ -1,6 +1,7 @@
 ##### pupillae -- pales
 The general idea of pales is to help the user read the data collected.
 
+**html**: Django project.
 
 **pales.py**: pales reads the data from the source and turns it (or by delegation) into a format that is readable, or according to the format specified by the user, for the platform that the user is viewing the information on.
 
