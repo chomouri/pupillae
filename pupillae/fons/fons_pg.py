@@ -1,6 +1,6 @@
 # Connection and Database functions for fons
 from datetime import datetime
-from typing import Dict, List
+from typing import Any, Dict, List
 import psycopg2
 from psycopg2 import sql
 from pupillae.conf import config

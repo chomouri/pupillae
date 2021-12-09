@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Dict
+from typing import Any, Dict
 
 import psycopg2
 import dearpygui.dearpygui as dpg
