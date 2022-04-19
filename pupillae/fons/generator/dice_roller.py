@@ -27,12 +27,28 @@ def roll_4d6d():
     del total[0]
     return sum(total)
 
-def roll_die(quantity, sides):
+def roll_die(quantity, sides, drop = False):
     array_raw = []
     for i in range(quantity):
         roll = random.randint(1, sides)
         array_raw.append(roll)
+    if drop:
+        array = list(array_raw)
+        array.sort()
+        del array[0]
+        return array, array_raw
     return array_raw
+
+def roll_char_stats():
+    """For 6 stats: Roll 4d6, drop lowest"""
+    quant = 4
+    sides = 6
+    stats = ""
+    for i in range(1, 7):
+        array, array_raw = roll_die(quant, sides, drop = True)
+        stats += f"\nStat #{i} = {quant}x d{sides} = {array_raw}\
+            \n--Total: {sum(array)}."
+    return stats
 
 def process_roll(message):
     reply = re.split(r'd', message)
@@ -64,7 +80,7 @@ def parse_roll(message):
             sides = quant_side[1]
             if sides.isdigit():
                 sides = int(quant_side[1])
-                if sides > 100:
+                if sides > 1000:
                     error_msg.append("Too many sides of the dice")
                     inv_grp = True
             else:

@@ -88,8 +88,11 @@ async def on_message(message) -> None:
             await message.channel.send(response)
 
     if message.content.startswith("$roll "):
-        dice = message.content
-        response = f"Offical:\n {dr.parse_roll(dice)}"
+        if message.content.startswith("$roll char"):
+            response = f"Offical:\n {dr.roll_char_stats()}"
+        else:
+            dice = message.content
+            response = f"Offical:\n {dr.parse_roll(dice)}"
         await message.channel.send(response)
 
 @client.event
