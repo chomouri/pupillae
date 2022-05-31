@@ -52,8 +52,9 @@ Various tweaks may be required to adapt the tools to your needs, but I hope they
 #### Daemonisation:
 To get the source path/bin/activate for poetry, while in the pupillae folder:
 `poetry env info -p`
-cd into this directory/bin and ls, you will see various activate and activate.*, etc files.
-sudo touch /etc/systemd/system/pupillae.service
+cd into this `directory/bin` and ls, you will see various `activate` and `activate.*`, etc files.
+
+`sudo touch /etc/systemd/system/pupillae.service`
 ```
 [Unit]
 Description=pupillae_bot
@@ -66,7 +67,7 @@ ExecStart=/bin/bash -c 'cd /path/to/pupillae && source <see-above-for-path>/bin/
 [Install]
 WantedBy=multi-user.target
 ```
-sudo nano /etc/systemd/system/pupillae.service
-sudo systemctl daemon-reload
-sudo systemctl start pupillae.service
-sudo systemctl status pupillae.service
+`sudo nano /etc/systemd/system/pupillae.service`
+`sudo systemctl daemon-reload`
+`sudo systemctl start pupillae.service`
+`sudo systemctl status pupillae.service`
